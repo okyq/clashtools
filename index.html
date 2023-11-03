@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Encode and Decode Tool</title>
+<meta charset="UTF-8">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f4;
+    }
+    .container {
+      width: 350px;
+      margin: 0 auto;
+      text-align: center;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      resize: vertical; /* Enable vertical resizing */
+      max-height: 200px; /* Set a maximum height */
+    }
+    button {
+      background-color: #0074cc;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #0052a3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Encode and Decode Tool</h1>
+    <textarea id="inputText" placeholder="Enter Text"></textarea>
+    <button id="encodeButton" onclick="base64Encode()">Base64 Encode</button>
+    <button id="decodeButton" onclick="base64Decode()">Base64 Decode</button>
+    <button id="urlEncodeButton" onclick="urlEncode()">URL Encode</button>
+    <button id="convertVmessButton" onclick="convertVmess()">vmessCovert</button>
+<button id="getVmessNameButton" onclick="getVmessName()">getVmessName</button>
+    <textarea id="outputText" rows="4" placeholder="Encoded/Decoded text will be displayed here"></textarea>
+
+    <script>
+   
+   function convertVmess() {
+    const inputText = document.getElementById("inputText").value;
+    const vmessLinks = inputText.split('\n').map(link => link.trim());
+    const result = [];
+    vmessLinks.forEach(vmessLink => {
+        const dataStartIndex = vmessLink.indexOf("vmess://");
+        if (dataStartIndex >= 0) {
+            const vmessData = vmessLink.slice(dataStartIndex + 8);
+            const decodedData = atob(vmessData);
+            const parsedData = JSON.parse(decodedData);
+
+            const formattedOutput = `  - {name: ${parsedData.ps}, server: ${parsedData.add}, port: ${parsedData.port}, type: vmess, uuid: ${parsedData.id}, alterId: ${parsedData.aid}, cipher: auto, tls: true, skip-cert-verify: true, network: ${parsedData.net}, ws-opts: {path: ${parsedData.path}, headers: {Host: ${parsedData.add}}}, udp: true}`;
+
+            result.push(formattedOutput);
+        }
+    });
+    document.getElementById("outputText").value = result.join('\n');
+}
+
+function getVmessName() {
+    const inputText = document.getElementById("inputText").value;
+    const vmessLinks = inputText.split('\n').map(link => link.trim());
+    const result = [];
+    vmessLinks.forEach(vmessLink => {
+        const dataStartIndex = vmessLink.indexOf("vmess://");
+        if (dataStartIndex >= 0) {
+            const vmessData = vmessLink.slice(dataStartIndex + 8);
+            const decodedData = atob(vmessData);
+            const parsedData = JSON.parse(decodedData);
+
+            // 添加提取的parsedData.ps到result数组
+            result.push(`      - ${parsedData.ps}`);
+        }
+    });
+    document.getElementById("outputText").value = result.join('\n');
+}
+
+      function base64Encode() {
+        const inputText = document.getElementById("inputText").value;
+        const encodedText = btoa(inputText);
+        document.getElementById("outputText").value = encodedText;
+      }
+
+      function base64Decode() {
+        const inputText = document.getElementById("inputText").value;
+        let decodedText;
+        try {
+          decodedText = atob(inputText);
+        } catch (error) {
+          decodedText = "Invalid Base64";
+        }
+        document.getElementById("outputText").value = decodedText;
+      }
+
+      function urlEncode() {
+        const inputText = document.getElementById("inputText").value;
+        const encodedText = encodeURIComponent(inputText);
+        document.getElementById("outputText").value = encodedText;
+      }
+    </script>
+  </div>
+</body>
+</html>
